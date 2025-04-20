@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Travel Collections - Deployment Diagnostic</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --background: #ffffff;
+      --foreground: #1f2937;
+      --card: #f9fafb;
+      --card-foreground: #111827;
+      --border: #e5e7eb;
+      --ring: #e5e7eb;
+      --radius: 0.5rem;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      color: var(--foreground);
+      background-color: var(--background);
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    h2 svg {
+      margin-right: 0.5rem;
+    }
+    
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    button, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      height: 2.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .button-primary {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .button-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .button-outline {
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+    
+    .button-outline:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+    
+    pre {
+      background-color: #1f2937;
+      color: #f9fafb;
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      font-weight: 600;
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      padding: 0.25rem 0.75rem;
+      font-weight: 500;
+      font-size: 0.75rem;
+      line-height: 1;
+    }
+    
+    .badge-success {
+      background-color: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+    }
+    
+    .badge-error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+    
+    .badge-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .progress-container {
+      width: 100%;
+      background-color: var(--border);
+      border-radius: 9999px;
+      height: 0.5rem;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
+    
+    .icon {
+      display: inline-block;
+      width: 1.25rem;
+      height: 1.25rem;
+      vertical-align: text-bottom;
+    }
+    
+    .result-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    
+    .result-item .icon {
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+    
+    .result-item .label {
+      flex-grow: 1;
+    }
+    
+    .result-item .status {
+      font-weight: 500;
+    }
+    
+    .success { color: var(--success); }
+    .error { color: var(--error); }
+    .warning { color: var(--warning); }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.25rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .card {
+        padding: 1rem;
+      }
+      
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Deep Travel Collections</h1>
+      <p>Deployment Diagnostic Tool</p>
+    </header>
+    
+    <div class="card">
+      <div class="card-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+          System Status
+        </h2>
+        <div class="card-actions">
+          <button id="refreshButton" class="button button-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      
+      <div id="status-indicator" class="progress-container">
+        <div class="progress-bar" style="width: 0%"></div>
+      </div>
+      
+      <div id="system-status">Running system checks...</div>
+    </div>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="services">External Services</div>
+      <div class="tab" data-tab="environment">Environment</div>
+      <div class="tab" data-tab="frontend">Frontend</div>
+      <div class="tab" data-tab="troubleshooting">Troubleshooting</div>
+    </div>
+    
+    <div class="tab-content active" data-tab="services">
+      <div class="card">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.53 0 1.039.211 1.414.586l7 7c.377.378.586.886.586 1.414s-.209 1.036-.586 1.414l-7 7a2 2 0 0 1-2.828 0l-7-7a2 2 0 0 1 0-2.828l7-7A1.99 1.99 0 0 1 12 3z"></path><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path></svg>
+          External Service Connectivity
+        </h2>
+        <div id="services-status">Checking service connectivity...</div>
+      </div>
+    </div>
+    
+    <div class="tab-content" data-tab="environment">
+      <div class="card">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-7"></path><path d="M14 17H6"></path><circle cx="4" cy="7" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+          Environment Variables
+        </h2>
+        <div id="env-vars">Loading environment information...</div>
+      </div>
+    </div>
+    
+    <div class="tab-content" data-tab="frontend">
+      <div class="card">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9-9-1.8-9-9 1.8-9 9-9"></path><path d="M8 10h8"></path><path d="M8 14h8"></path><path d="M8 18h8"></path></svg>
+          Frontend Resources
+        </h2>
+        <div id="frontend-resources">Checking frontend resources...</div>
+      </div>
+    </div>
+    
+    <div class="tab-content" data-tab="troubleshooting">
+      <div class="card">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          Troubleshooting Steps
+        </h2>
+        <div id="troubleshooting-content">
+          <ol>
+            <li><strong>Check Environment Variables:</strong> Ensure all required environment variables are set in Replit's Secrets tab.</li>
+            <li><strong>Verify .replit Configuration:</strong> Make sure the .replit file has the correct deployment settings.</li>
+            <li><strong>Check Build Process:</strong> Look for any errors in the Replit deployment logs.</li>
+            <li><strong>Test API Connection:</strong> Visit <a href="/api/diagnostic" target="_blank">/api/diagnostic</a> to check API health.</li>
+            <li><strong>Check Browser Console:</strong> Open your browser's developer tools console for JavaScript errors.</li>
+            <li><strong>Clear Cache:</strong> Try clearing your browser cache or using incognito mode.</li>
+            <li><strong>Check Asset Paths:</strong> Make sure all asset paths in the HTML are correct (should use relative paths).</li>
+            <li><strong>Verify Server is Running:</strong> Confirm the Node.js server is running properly in Replit.</li>
+          </ol>
+          
+          <h3>Common Solutions:</h3>
+          <ul>
+            <li>Add all environment variables in Replit's Secrets tab (gear icon in sidebar).</li>
+            <li>Ensure package.json has the right build and start scripts.</li>
+            <li>Check the .replit file has proper deployment configuration.</li>
+            <li>Run 'node scripts/blank-page-fix.js' before deploying again.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab functionality
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          
+          // Update active tab
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Show active content
+          tabContents.forEach(content => {
+            content.classList.remove('active');
+            if (content.getAttribute('data-tab') === tabId) {
+              content.classList.add('active');
+            }
+          });
+        });
+      });
+      
+      // Run diagnostic
+      runDiagnostic();
+      
+      // Refresh button
+      document.getElementById('refreshButton').addEventListener('click', function() {
+        runDiagnostic();
+      });
+    });
+    
+    function updateProgressBar(percent) {
+      document.querySelector('.progress-bar').style.width = percent + '%';
+    }
+    
+    function runDiagnostic() {
+      updateProgressBar(10);
+      document.getElementById('system-status').innerHTML = '<p>Running system checks...</p>';
+      document.getElementById('services-status').innerHTML = '<p>Checking service connectivity...</p>';
+      document.getElementById('env-vars').innerHTML = '<p>Loading environment information...</p>';
+      document.getElementById('frontend-resources').innerHTML = '<p>Checking frontend resources...</p>';
+      
+      // Check system health
+      updateSystemHealth();
+      
+      // Check services
+      checkServices();
+      
+      // Check environment
+      checkEnvironment();
+      
+      // Check frontend resources
+      checkFrontendResources();
+    }
+    
+    function updateSystemHealth() {
+      // Try to fetch the API diagnostic endpoint
+      fetch('/api/diagnostic')
+        .then(response => {
+          updateProgressBar(30);
+          if (!response.ok) {
+            throw new Error(`API returned status ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          updateProgressBar(50);
+          // Update system status
+          let statusHtml = '<div class="result-item">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="icon success" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' +
+            '<span class="label">API Health</span>' +
+            '<span class="status success">Available</span>' +
+            '</div>';
+          
+          // Add environment info
+          statusHtml += '<div class="result-item">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-7"></path><path d="M14 17H6"></path><circle cx="4" cy="7" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>' +
+            '<span class="label">Environment</span>' +
+            '<span class="status">' + (data.environment || 'Unknown') + '</span>' +
+            '</div>';
+          
+          // Add timestamp
+          statusHtml += '<div class="result-item">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
+            '<span class="label">Last Check</span>' +
+            '<span class="status">' + (data.timestamp || new Date().toISOString()) + '</span>' +
+            '</div>';
+          
+          document.getElementById('system-status').innerHTML = statusHtml;
+          
+          // Update service information if available
+          if (data.serviceStatus) {
+            updateServicesStatus(data.serviceStatus);
+          }
+          
+          // Update environment information if available
+          if (data.envInfo) {
+            updateEnvironmentInfo(data.envInfo);
+          }
+        })
+        .catch(error => {
+          updateProgressBar(50);
+          let errorHtml = '<div class="result-item">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="icon error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
+            '<span class="label">API Health</span>' +
+            '<span class="status error">Unavailable</span>' +
+            '</div>';
+          
+          errorHtml += '<div class="result-item">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="icon error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
+            '<span class="label">Error</span>' +
+            '<span class="status error">' + error.message + '</span>' +
+            '</div>';
+          
+          // Fall back to basic checks
+          document.getElementById('system-status').innerHTML = errorHtml;
+          fallbackServiceCheck();
+        });
+    }
+    
+    function checkServices() {
+      // This will be updated by the API call in updateSystemHealth
+      // But provide a fallback in case that fails
+    }
+    
+    function updateServicesStatus(services) {
+      let servicesHtml = '<h3>External Services</h3>';
+      
+      // Check each service
+      for (const [service, available] of Object.entries(services)) {
+        const icon = available 
+          ? '<svg xmlns="http://www.w3.org/2000/svg" class="icon success" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+          : '<svg xmlns="http://www.w3.org/2000/svg" class="icon error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+          
+        const status = available 
+          ? '<span class="status success">Available</span>'
+          : '<span class="status error">Not Available</span>';
+          
+        servicesHtml += '<div class="result-item">' +
+          icon +
+          '<span class="label">' + service + '</span>' +
+          status +
+          '</div>';
+      }
+      
+      // Add helpful message for missing services
+      if (Object.values(services).includes(false)) {
+        servicesHtml += '<div class="card" style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 1rem;">' +
+          '<p><strong>Missing Services Detected</strong></p>' +
+          '<p>One or more services are not available. This may be due to missing environment variables in deployment.</p>' +
+          '<p>To fix this:</p>' +
+          '<ol>' +
+          '<li>Go to your Replit project</li>' +
+          '<li>Click the lock icon (🔒) in the sidebar or go to the "Secrets" tab</li>' +
+          '<li>Add the missing environment variables</li>' +
+          '<li>Redeploy your application</li>' +
+          '</ol>' +
+          '</div>';
+      }
+      
+      document.getElementById('services-status').innerHTML = servicesHtml;
+      updateProgressBar(70);
+    }
+    
+    function fallbackServiceCheck() {
+      // If the API diagnostic fails, try some basic checks directly
+      
+      // Mock a services check
+      const mockServices = {
+        'Stripe': false,
+        'SendGrid': false,
+        'OpenAI': false,
+        'Database': false,
+        'Fallback Systems': false
+      };
+      
+      // Try a direct API call to see if server is running at all
+      fetch('/api/favorites/count')
+        .then(response => {
+          if (response.ok) {
+            mockServices.Database = true;
+          }
+          return response.json();
+        })
+        .catch(() => {
+          // Keep false
+        })
+        .finally(() => {
+          updateServicesStatus(mockServices);
+          
+          // Hard-coded environment info
+          const envInfo = {
+            'NODE_ENV': 'production',
+            'DATABASE_URL': 'Unknown (API unavailable)',
+            'STRIPE_SECRET_KEY': 'Unknown (API unavailable)',
+            'VITE_STRIPE_PUBLIC_KEY': 'Unknown (API unavailable)',
+            'OPENAI_API_KEY': 'Unknown (API unavailable)',
+            'SENDGRID_API_KEY': 'Unknown (API unavailable)',
+          };
+          
+          updateEnvironmentInfo(envInfo);
+        });
+    }
+    
+    function checkEnvironment() {
+      // This will be updated by the API call in updateSystemHealth
+    }
+    
+    function updateEnvironmentInfo(envInfo) {
+      let envHtml = '<h3>Environment Variables</h3>';
+      envHtml += '<table><thead><tr><th>Variable</th><th>Status</th></tr></thead><tbody>';
+      
+      for (const [key, value] of Object.entries(envInfo)) {
+        const status = value && value !== 'Not Available' 
+          ? '<span class="badge badge-success">Available</span>'
+          : '<span class="badge badge-error">Not Available</span>';
+          
+        envHtml += '<tr><td>' + key + '</td><td>' + status + '</td></tr>';
+      }
+      
+      envHtml += '</tbody></table>';
+      
+      document.getElementById('env-vars').innerHTML = envHtml;
+      updateProgressBar(90);
+    }
+    
+    function checkFrontendResources() {
+      // Check for critical frontend resources
+      const resources = [
+        { name: 'HTML Document', path: '/', type: 'document' },
+        { name: 'Assets Directory', path: '/assets', type: 'directory' },
+        { name: 'JavaScript Bundle', path: '/assets/index.js', type: 'file' },
+        { name: 'CSS Styles', path: '/assets/index.css', type: 'file' },
+      ];
+      
+      let frontendHtml = '<h3>Resource Availability</h3>';
+      let checksCompleted = 0;
+      
+      resources.forEach(resource => {
+        fetch(resource.path)
+          .then(response => {
+            const status = response.ok
+              ? '<span class="status success">Available</span>'
+              : '<span class="status error">Not Available (' + response.status + ')</span>';
+              
+            const icon = response.ok
+              ? '<svg xmlns="http://www.w3.org/2000/svg" class="icon success" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+              : '<svg xmlns="http://www.w3.org/2000/svg" class="icon error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+              
+            frontendHtml += '<div class="result-item">' +
+              icon +
+              '<span class="label">' + resource.name + '</span>' +
+              status +
+              '</div>';
+          })
+          .catch(() => {
+            frontendHtml += '<div class="result-item">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" class="icon error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
+              '<span class="label">' + resource.name + '</span>' +
+              '<span class="status error">Not Available (Error)</span>' +
+              '</div>';
+          })
+          .finally(() => {
+            checksCompleted++;
+            if (checksCompleted === resources.length) {
+              document.getElementById('frontend-resources').innerHTML = frontendHtml;
+              updateProgressBar(100);
+            }
+          });
+      });
+    }
+  </script>
+</body>
+</html>

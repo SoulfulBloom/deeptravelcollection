@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direct PDF Download</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #2563eb;
+      margin-bottom: 30px;
+    }
+    .download-button {
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      padding: 15px 30px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+      max-width: 300px;
+    }
+    .download-button:hover {
+      background-color: #1d4ed8;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 40px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+    p {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Direct PDF Download</h1>
+  
+  <div class="card">
+    <p>Click the button below to download the PDF directly (ID: 12)</p>
+    <a class="download-button" href="/api/pdf/12" download>Download PDF Now</a>
+  </div>
+  
+  <div class="options">
+    <h2>Try Alternative Methods</h2>
+    
+    <div class="card">
+      <p>Try downloading using the direct sendFile approach:</p>
+      <a class="download-button" href="/api/pdf/12" download>Method 1: SendFile</a>
+    </div>
+    
+    <div class="card">
+      <p>Try downloading using the serve-pdf endpoint (readFileSync approach):</p>
+      <a class="download-button" href="/api/serve-pdf/12" download>Method 2: ReadFileSync</a>
+    </div>
+    
+    <div class="card">
+      <p>Try using the original path format:</p>
+      <a class="download-button" href="/downloads/itineraries/itinerary_12.pdf" download>Method 3: Original Path</a>
+    </div>
+  </div>
+</body>
+</html>

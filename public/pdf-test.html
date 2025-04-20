@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Download Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .download-button {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+    .download-button:hover {
+      background-color: #45a049;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    h2 {
+      color: #555;
+      margin-top: 30px;
+    }
+    code {
+      background-color: #f5f5f5;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>PDF Download Test Page</h1>
+  
+  <div class="card">
+    <h2>Download Options</h2>
+    
+    <div>
+      <h3>Option 1: Direct API Endpoint</h3>
+      <p>This uses the dedicated API endpoint to serve the PDF:</p>
+      <a class="download-button" href="/api/serve-pdf/12" target="_blank">Download PDF (ID: 12)</a>
+    </div>
+    
+    <div>
+      <h3>Option 2: Static File Path</h3>
+      <p>This attempts to download from the static file path:</p>
+      <a class="download-button" href="/downloads/itineraries/itinerary_12.pdf" target="_blank">Download Static PDF</a>
+    </div>
+    
+    <div>
+      <h3>Option 3: Full URL Path</h3>
+      <p>This uses the complete URL:</p>
+      <a class="download-button" id="fullUrlLink" href="#" target="_blank">Download with Full URL</a>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Download Testing for Other IDs</h2>
+    <p>Use these links to test downloads of other itinerary PDFs:</p>
+    
+    <div>
+      <a class="download-button" href="/api/serve-pdf/8" target="_blank">Download PDF (ID: 8)</a>
+      <a class="download-button" href="/api/serve-pdf/9" target="_blank">Download PDF (ID: 9)</a>
+      <a class="download-button" href="/api/serve-pdf/10" target="_blank">Download PDF (ID: 10)</a>
+      <a class="download-button" href="/api/serve-pdf/11" target="_blank">Download PDF (ID: 11)</a>
+    </div>
+  </div>
+
+  <script>
+    // Set the full URL link dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+      const baseUrl = window.location.origin;
+      const fullUrlLink = document.getElementById('fullUrlLink');
+      fullUrlLink.href = `${baseUrl}/api/serve-pdf/12`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Travel Collections - Diagnostic</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 { color: #2563eb; }
+    h2 { margin-top: 2rem; }
+    .card {
+      background-color: #f9fafb;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-weight: 500;
+      margin: 0.25rem;
+    }
+    .status { 
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .success { background-color: #dcfce7; color: #166534; }
+    .error { background-color: #fee2e2; color: #b91c1c; }
+    .warning { background-color: #fef9c3; color: #854d0e; }
+    .info { background-color: #dbeafe; color: #1e40af; }
+    pre {
+      background-color: #f1f5f9;
+      padding: 1rem;
+      border-radius: 0.25rem;
+      overflow-x: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Deep Travel Collections - Diagnostic</h1>
+  <p>This page helps diagnose any deployment or runtime issues with the application.</p>
+  
+  <div class="card">
+    <h2>Environment</h2>
+    <div id="environment" class="status">Checking environment...</div>
+    <pre id="env-details"></pre>
+  </div>
+  
+  <div class="card">
+    <h2>API Connectivity</h2>
+    <div id="api-status" class="status">Checking API status...</div>
+    <div class="grid">
+      <button onclick="testApi('/api/health')">Test Health Endpoint</button>
+      <button onclick="testApi('/api/favorites/count')">Test Favorites API</button>
+    </div>
+    <pre id="api-response"></pre>
+  </div>
+  
+  <div class="card">
+    <h2>External Services</h2>
+    <div id="services-status" class="status">Checking services...</div>
+    <div class="grid">
+      <button onclick="checkService('stripe')">Check Stripe</button>
+      <button onclick="checkService('openai')">Check OpenAI</button>
+      <button onclick="checkService('db')">Check Database</button>
+    </div>
+    <pre id="services-details"></pre>
+  </div>
+  
+  <div class="card">
+    <h2>Static Asset Check</h2>
+    <div id="assets-status" class="status">Checking assets...</div>
+    <div class="grid">
+      <button onclick="checkAsset('/assets/index-Co_hPfSy.js')">Check JS</button>
+      <button onclick="checkAsset('/assets/index-DLFt0bG3.css')">Check CSS</button>
+      <button onclick="checkAsset('/assets/deep-travel-logo-BChslCTS.png')">Check Logo</button>
+    </div>
+    <pre id="assets-details"></pre>
+  </div>
+  
+  <script>
+    // Check environment
+    async function checkEnvironment() {
+      const envElement = document.getElementById('environment');
+      const envDetails = document.getElementById('env-details');
+      
+      try {
+        const userAgent = navigator.userAgent;
+        const timestamp = new Date().toISOString();
+        const url = window.location.href;
+        const deployed = url.includes('.replit.app') || url.includes('.repl.co');
+        
+        envElement.className = 'status info';
+        envElement.textContent = 'Environment information gathered';
+        
+        envDetails.textContent = JSON.stringify({
+          userAgent,
+          timestamp,
+          url,
+          deployed,
+          location: window.location,
+          protocol: window.location.protocol,
+          hostname: window.location.hostname
+        }, null, 2);
+      } catch (error) {
+        envElement.className = 'status error';
+        envElement.textContent = 'Error checking environment';
+        envDetails.textContent = error.toString();
+      }
+    }
+    
+    // Test API endpoint
+    async function testApi(endpoint) {
+      const statusElement = document.getElementById('api-status');
+      const responseElement = document.getElementById('api-response');
+      
+      statusElement.className = 'status info';
+      statusElement.textContent = 'Testing API endpoint: ' + endpoint;
+      
+      try {
+        const start = performance.now();
+        const response = await fetch(endpoint);
+        const end = performance.now();
+        const responseTime = Math.round(end - start);
+        
+        let data;
+        let contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          data = await response.text();
+        }
+        
+        if (response.ok) {
+          statusElement.className = 'status success';
+          statusElement.textContent = 'API endpoint ' + endpoint + ' is working! (' + responseTime + 'ms)';
+        } else {
+          statusElement.className = 'status error';
+          statusElement.textContent = 'API endpoint returned status: ' + response.status;
+        }
+        
+        responseElement.textContent = JSON.stringify({
+          endpoint,
+          status: response.status,
+          responseTime: responseTime + 'ms',
+          data
+        }, null, 2);
+      } catch (error) {
+        statusElement.className = 'status error';
+        statusElement.textContent = 'Error testing API: ' + error.message;
+        responseElement.textContent = error.toString();
+      }
+    }
+    
+    // Check external service
+    async function checkService(service) {
+      const statusElement = document.getElementById('services-status');
+      const detailsElement = document.getElementById('services-details');
+      
+      statusElement.className = 'status info';
+      statusElement.textContent = 'Checking service: ' + service;
+      
+      try {
+        const response = await fetch('/api/check-service?service=' + service);
+        const data = await response.json();
+        
+        if (data.available) {
+          statusElement.className = 'status success';
+          statusElement.textContent = service + ' service is available';
+        } else {
+          statusElement.className = 'status warning';
+          statusElement.textContent = service + ' service is unavailable';
+        }
+        
+        detailsElement.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        statusElement.className = 'status error';
+        statusElement.textContent = 'Error checking service: ' + error.message;
+        detailsElement.textContent = error.toString();
+      }
+    }
+    
+    // Check if asset is accessible
+    async function checkAsset(assetPath) {
+      const statusElement = document.getElementById('assets-status');
+      const detailsElement = document.getElementById('assets-details');
+      
+      statusElement.className = 'status info';
+      statusElement.textContent = 'Checking asset: ' + assetPath;
+      
+      try {
+        const start = performance.now();
+        const response = await fetch(assetPath);
+        const end = performance.now();
+        const responseTime = Math.round(end - start);
+        
+        if (response.ok) {
+          statusElement.className = 'status success';
+          statusElement.textContent = 'Asset ' + assetPath + ' is accessible! (' + responseTime + 'ms)';
+        } else {
+          statusElement.className = 'status error';
+          statusElement.textContent = 'Asset returned status: ' + response.status;
+        }
+        
+        detailsElement.textContent = JSON.stringify({
+          assetPath,
+          status: response.status,
+          responseTime: responseTime + 'ms',
+          contentType: response.headers.get('content-type'),
+          contentLength: response.headers.get('content-length')
+        }, null, 2);
+      } catch (error) {
+        statusElement.className = 'status error';
+        statusElement.textContent = 'Error checking asset: ' + error.message;
+        detailsElement.textContent = error.toString();
+      }
+    }
+    
+    // Run initial checks
+    window.onload = function() {
+      checkEnvironment();
+      setTimeout(() => testApi('/api/health'), 500);
+    };
+  </script>
+</body>
+</html>
