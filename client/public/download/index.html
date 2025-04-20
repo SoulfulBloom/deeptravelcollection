@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Travel Collections - Redirecting</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .logo {
+      margin-bottom: 2rem;
+      max-width: 200px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      margin-top: 0;
+      color: #0066cc;
+    }
+    .progress {
+      height: 4px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #0066cc;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .redirect-message {
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover {
+      background-color: #0055aa;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Deep Travel Collections</h1>
+    <p>We've detected that you're accessing our app from an incorrect deployment path.</p>
+    
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <p class="redirect-message">Redirecting you to the correct location...</p>
+    <p id="countdown">Redirecting in 3 seconds...</p>
+    
+    <button onclick="redirectNow()">Go Now</button>
+  </div>
+
+  <script>
+    // Track deployment issues
+    console.log("Deployment issue: Accessed via /download path");
+    
+    // Set up the progress bar
+    const progressBar = document.getElementById('progress-bar');
+    const countdownEl = document.getElementById('countdown');
+    let timeLeft = 3;
+    let progress = 0;
+    
+    // Update progress bar
+    const interval = setInterval(() => {
+      progress += 1;
+      progressBar.style.width = `${progress}%`;
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        redirectToRoot();
+      }
+      
+      // Update countdown every second
+      if (progress % 33 === 0) {
+        timeLeft -= 1;
+        countdownEl.textContent = `Redirecting in ${timeLeft} seconds...`;
+      }
+    }, 30);
+    
+    // Redirect to root path
+    function redirectToRoot() {
+      const currentHost = window.location.host;
+      const protocol = window.location.protocol;
+      window.location.href = `${protocol}//${currentHost}/?from=download&ts=${Date.now()}`;
+    }
+    
+    // Manual redirect
+    function redirectNow() {
+      clearInterval(interval);
+      redirectToRoot();
+    }
+  </script>
+</body>
+</html>
