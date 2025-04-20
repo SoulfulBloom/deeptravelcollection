@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100px" height="130px" viewBox="0 0 100 130" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g id="Palm-Tree" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M50,0 C50,0 40,10 38,15 C36,20 35,30 40,35 C45,40 50,35 50,35 C50,35 55,40 60,35 C65,30 64,20 62,15 C60,10 50,0 50,0 Z" id="Top-Leaf" fill="#006400"></path>
+        <path d="M50,10 C50,10 35,15 30,25 C25,35 30,45 35,50 C40,55 50,50 50,50 C50,50 60,55 65,50 C70,45 75,35 70,25 C65,15 50,10 50,10 Z" id="Middle-Leaf" fill="#008000"></path>
+        <path d="M50,25 C50,25 30,25 22,40 C14,55 20,70 30,75 C40,80 50,70 50,70 C50,70 60,80 70,75 C80,70 86,55 78,40 C70,25 50,25 50,25 Z" id="Bottom-Leaf" fill="#00A000"></path>
+        <rect id="Trunk" fill="#8B4513" x="45" y="60" width="10" height="70" rx="5"></rect>
+    </g>
+</svg>
