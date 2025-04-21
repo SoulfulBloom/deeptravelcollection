@@ -4,16 +4,10 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   build: {
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
-      external: ['web-vitals'],
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom']
-        }
-      }
-    },
-    commonjsOptions: {
-      transformMixedEsModules: true
+      external: ['web-vitals']
     }
   },
   resolve: {
@@ -22,3 +16,4 @@ export default defineConfig({
     }
   }
 });
+ 
