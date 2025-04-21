@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd client && npm install && npm run build"
+buildCommand = "cd client && npm install --legacy-peer-deps && npm run build"
 
 [deploy]
 startCommand = "npx serve -s client/dist"
