@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "scripts": "scripts": {
+  "scripts": {
   "dev": "NODE_ENV=development tsx server/index.ts",
   "build": "cd client && npm install && npm run build",
   "start": "NODE_ENV=production node dist/index.js",
