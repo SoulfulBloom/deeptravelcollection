@@ -1,4 +1,1 @@
-"scripts": {
-  "build": "mkdir -p client/dist && cp -r client/public/* client/dist/ && cp client/public/index.html client/dist/index.html",
-  "start": "npx serve -s client/dist"
-}
+ "build": "mkdir -p client/dist && cp -r client/public/client/public/* client/dist/",
