@@ -1,9 +1,4 @@
-{
-  "name": "deeptravelcollection-minimal",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "build": "mkdir -p client/dist && cp -r client/public/* client/dist/",
-    "start": "npx serve -s client/dist"
-  }
+"scripts": {
+  "build": "mkdir -p client/dist && cp -r client/public/* client/dist/ && cp client/public/index.html client/dist/index.html",
+  "start": "npx serve -s client/dist"
 }
