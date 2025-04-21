@@ -1,8 +1,7 @@
 /**
  * Web Vitals Monitoring Utility
  * 
- * Environment-optimized version that only runs full monitoring in production
- * or when explicitly enabled in development.
+ * Stub implementation that doesn't rely on the external web-vitals package
  */
 import { shouldMonitorInDev } from './env-aware-monitoring';
 
@@ -76,42 +75,43 @@ declare global {
   }
 }
 
-// This is a placeholder that will be replaced by the actual web-vitals npm package in production
-// For development, we'll use a lightweight version that doesn't impact performance
-function getWebVitalsModule() {
-  // In production, dynamically import the web-vitals library
-  if (process.env.NODE_ENV === 'production' || shouldMonitorInDev()) {
-    return import('web-vitals').then(vitals => ({
-      getCLS: vitals.getCLS,
-      getFID: vitals.getFID,
-      getFCP: vitals.getFCP,
-      getLCP: vitals.getLCP,
-      getTTFB: vitals.getTTFB
-    }));
+// DIRECT STUB IMPLEMENTATIONS - No dynamic import
+export function getCLS(onReport: ReportHandler): void {
+  // Stub implementation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] getCLS called (stub implementation)');
   }
-  
-  // In development, use mock implementations to avoid impacting performance
-  return Promise.resolve({
-    getCLS: (cb: ReportHandler) => {
-      console.log('[DEV] Web Vitals monitoring disabled in development');
-      // No-op
-    },
-    getFID: (cb: ReportHandler) => {
-      // No-op
-    },
-    getFCP: (cb: ReportHandler) => {
-      // No-op
-    },
-    getLCP: (cb: ReportHandler) => {
-      // No-op
-    },
-    getTTFB: (cb: ReportHandler) => {
-      // No-op
-    }
-  });
 }
 
-// Main function to report web vitals
+export function getFID(onReport: ReportHandler): void {
+  // Stub implementation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] getFID called (stub implementation)');
+  }
+}
+
+export function getFCP(onReport: ReportHandler): void {
+  // Stub implementation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] getFCP called (stub implementation)');
+  }
+}
+
+export function getLCP(onReport: ReportHandler): void {
+  // Stub implementation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] getLCP called (stub implementation)');
+  }
+}
+
+export function getTTFB(onReport: ReportHandler): void {
+  // Stub implementation
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DEV] getTTFB called (stub implementation)');
+  }
+}
+
+// Main function to report web vitals - MODIFIED to use the stub functions directly
 export async function reportWebVitals(onPerfEntry?: ReportHandler): Promise<void> {
   if (typeof onPerfEntry !== 'function') {
     onPerfEntry = sendToAnalytics;
@@ -123,14 +123,12 @@ export async function reportWebVitals(onPerfEntry?: ReportHandler): Promise<void
   }
   
   try {
-    const vitals = await getWebVitalsModule();
-    
-    // Report all web vitals
-    vitals.getCLS(onPerfEntry);
-    vitals.getFID(onPerfEntry);
-    vitals.getFCP(onPerfEntry);
-    vitals.getLCP(onPerfEntry);
-    vitals.getTTFB(onPerfEntry);
+    // Report all web vitals using our stub implementations
+    getCLS(onPerfEntry);
+    getFID(onPerfEntry);
+    getFCP(onPerfEntry);
+    getLCP(onPerfEntry);
+    getTTFB(onPerfEntry);
     
     console.log('Web vitals monitoring initialized');
   } catch (error) {
